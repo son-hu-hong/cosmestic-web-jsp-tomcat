@@ -57,6 +57,7 @@
     String newPassword = "";
     String confirmNewPassword = "";
     String currentPassword = "";
+    String newPasswordHash = "";
 
     String verifiedEmail = (String) session.getAttribute("profileVerifiedEmail");
     String verifiedPasswordHash = (String) session.getAttribute("profileVerifiedPasswordHash");
@@ -85,6 +86,7 @@
         newPassword = request.getParameter("newPassword") == null ? "" : request.getParameter("newPassword");
         confirmNewPassword = request.getParameter("confirmNewPassword") == null ? "" : request.getParameter("confirmNewPassword");
         currentPassword = request.getParameter("currentPassword") == null ? "" : request.getParameter("currentPassword");
+        newPasswordHash = newPassword.isEmpty() ? "" : PasswordUtil.hashPassword(newPassword);
 
         String action = request.getParameter("action");
 
@@ -135,15 +137,15 @@
                 } else if (passwordOtp.isEmpty()) {
                     error = "Vui lòng nhập OTP đổi mật khẩu.";
                 } else if (OTP.verifyOtp(currentUser.getUserEmail(), passwordOtp, OTP.TYPE_CHANGE_PASSWORD)) {
-                    verifiedPasswordHash = PasswordUtil.hashPassword(newPassword);
+                    verifiedPasswordHash = newPasswordHash;
                     session.setAttribute("profileVerifiedPasswordHash", verifiedPasswordHash);
                     success = "Xác minh OTP đổi mật khẩu thành công.";
                 } else {
                     error = "OTP đổi mật khẩu không hợp lệ hoặc đã hết hạn.";
                 }
             } else if ("save_profile".equals(action)) {
-                boolean usernameChanged = !userName.equals(currentUser.getUserName() == null ? "" : currentUser.getUserName());
-                boolean emailChanged = !userEmail.equalsIgnoreCase(currentUser.getUserEmail() == null ? "" : currentUser.getUserEmail());
+                boolean usernameChanged = !userName.equals((currentUser.getUserName() == null ? "" : currentUser.getUserName()));
+                boolean emailChanged = !userEmail.equalsIgnoreCase((currentUser.getUserEmail() == null ? "" : currentUser.getUserEmail()));
                 boolean passwordChanged = !newPassword.isEmpty();
                 boolean sensitiveChanged = usernameChanged || emailChanged || passwordChanged;
 
@@ -157,12 +159,12 @@
                     error = "Vui lòng xác minh OTP cho email mới trước khi lưu.";
                 } else if (passwordChanged && !newPassword.equals(confirmNewPassword)) {
                     error = "Xác nhận mật khẩu mới không khớp.";
-                } else if (passwordChanged && (verifiedPasswordHash == null || !verifiedPasswordHash.equals(PasswordUtil.hashPassword(newPassword)))) {
+                } else if (passwordChanged && (verifiedPasswordHash == null || !verifiedPasswordHash.equals(newPasswordHash))) {
                     error = "Vui lòng xác minh OTP đổi mật khẩu trước khi lưu.";
                 } else if (sensitiveChanged && (currentPassword.isEmpty() || !PasswordUtil.hashPassword(currentPassword).equals(currentUser.getPassword()))) {
                     error = "Bạn cần nhập đúng mật khẩu hiện tại để xác nhận thay đổi nhạy cảm.";
                 } else {
-                    String hashedPasswordToSave = passwordChanged ? PasswordUtil.hashPassword(newPassword) : currentUser.getPassword();
+                    String hashedPasswordToSave = passwordChanged ? newPasswordHash : currentUser.getPassword();
                     boolean updated = dao.updateProfileAccount(currentUser.getUserId(), userName, fullName, userSexual, userEmail, userPhone, userAddress, hashedPasswordToSave);
                     if (updated) {
                         currentUser = dao.getUserById(currentUser.getUserId());
@@ -486,11 +488,11 @@
 
                     <div class="form-group">
                         <label for="newPassword">Mật khẩu mới</label>
-                        <input type="password" id="newPassword" name="newPassword" value="<%= esc(newPassword) %>" autocomplete="new-password" placeholder="Để trống nếu không đổi">
+                        <input type="password" id="newPassword" name="newPassword" autocomplete="new-password" placeholder="Để trống nếu không đổi">
                     </div>
                     <div class="form-group" id="confirmPasswordGroup">
                         <label for="confirmNewPassword">Xác nhận mật khẩu mới</label>
-                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" value="<%= esc(confirmNewPassword) %>" autocomplete="new-password">
+                        <input type="password" id="confirmNewPassword" name="confirmNewPassword" autocomplete="new-password">
                     </div>
 
                     <div id="passwordOtpBox" class="otp-box full">
@@ -501,8 +503,8 @@
                             <button type="submit" class="btn btn-soft" data-action="verify_password_otp">Xác minh OTP mật khẩu</button>
                         </div>
                         <div style="font-size:12px;color:var(--muted)">
-                            <% if (verifiedPasswordHash != null && !newPassword.isEmpty() && verifiedPasswordHash.equals(PasswordUtil.hashPassword(newPassword))) { %>
-                                OTP đổi mật khẩu đã được xác minh cho mật khẩu hiện tại.
+                            <% if (verifiedPasswordHash != null && !newPassword.isEmpty() && verifiedPasswordHash.equals(newPasswordHash)) { %>
+                                OTP đổi mật khẩu đã được xác minh cho mật khẩu mới.
                             <% } else { %>
                                 Đổi mật khẩu bắt buộc phải gửi và xác minh OTP trước khi lưu.
                             <% } %>
@@ -511,7 +513,7 @@
 
                     <div class="form-group full">
                         <label for="currentPassword">Mật khẩu hiện tại (bắt buộc khi đổi Username/Email/Mật khẩu)</label>
-                        <input type="password" id="currentPassword" name="currentPassword" value="<%= esc(currentPassword) %>" autocomplete="current-password" placeholder="Nhập khi thay đổi thông tin nhạy cảm">
+                        <input type="password" id="currentPassword" name="currentPassword" autocomplete="current-password" placeholder="Nhập khi thay đổi thông tin nhạy cảm">
                     </div>
                 </div>
 

@@ -305,8 +305,7 @@ public class Users implements Serializable {
 
     public boolean updateProfileAccount(int userId, String userName, String fullName, String userSexual,
             String userEmail, String userPhone, String userAddress, String hashedPassword) {
-        String sql = "UPDATE users SET userName=?, fullName=?, userSexual=?, userEmail=?, userPhone=?, userAddress=?, "
-                + "pass" + "word=? WHERE userId=?";
+        String sql = "UPDATE users SET userName=?, fullName=?, userSexual=?, userEmail=?, userPhone=?, userAddress=?, password=? WHERE userId=?";
         try (Connection conn = Connect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, userName);

@@ -64,8 +64,8 @@ public class UploadServlet extends HttpServlet {
 
             // 4. Đổi tên file thành username của người dùng (Ví dụ: dosme.jpg)
             String safeUserName = currentUser.getUserName() == null ? "" : currentUser.getUserName().trim();
-            safeUserName = safeUserName.replaceAll("[^a-zA-Z0-9._-]", "_");
-            if (safeUserName.isEmpty()) {
+            safeUserName = safeUserName.replaceAll("[^a-zA-Z0-9_-]", "_");
+            if (safeUserName.isEmpty() || safeUserName.matches("^_+$")) {
                 safeUserName = String.valueOf(currentUser.getUserId());
             }
             String newFileName = safeUserName + extension;
