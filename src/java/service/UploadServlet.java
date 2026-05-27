@@ -28,7 +28,7 @@ public class UploadServlet extends HttpServlet {
             throws ServletException, IOException {
         
         // Đường dẫn trả về mặc định
-        String returnUrl = request.getContextPath() + "/UserProfile/config/";
+        String returnUrl = request.getContextPath() + "/UserProfile/";
 
         // 1. Kiểm tra session
         Users currentUser = (Users) request.getSession().getAttribute("user");
@@ -62,8 +62,13 @@ public class UploadServlet extends HttpServlet {
                 extension = ".png"; 
             }
 
-            // 4. Đổi tên file thành ID của người dùng (Ví dụ: 12.jpg)
-            String newFileName = currentUser.getUserId() + extension;
+            // 4. Đổi tên file thành username của người dùng (Ví dụ: dosme.jpg)
+            String safeUserName = currentUser.getUserName() == null ? "" : currentUser.getUserName().trim();
+            safeUserName = safeUserName.replaceAll("[^a-zA-Z0-9._-]", "_");
+            if (safeUserName.isEmpty()) {
+                safeUserName = String.valueOf(currentUser.getUserId());
+            }
+            String newFileName = safeUserName + extension;
 
             // 5. Tìm đường dẫn thực tế trên máy chủ để lưu ảnh
             String uploadPath = getServletContext().getRealPath("") + File.separator + "assets" + File.separator + "images" + File.separator + "avt";

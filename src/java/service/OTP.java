@@ -20,10 +20,13 @@ import io.jsonwebtoken.security.Keys;
 
 public class OTP {
 
-    // otpType: 1-Đăng ký, 2-Đăng nhập thiết bị lạ, 3-Quên mật khẩu
+    // otpType: 1-Đăng ký, 2-Đăng nhập thiết bị lạ, 3-Quên mật khẩu,
+    //          4-Đổi email, 5-Đổi mật khẩu
     public static final int TYPE_REGISTER = 1;
     public static final int TYPE_NEW_DEVICE_LOGIN = 2;
     public static final int TYPE_FORGOT_PASSWORD = 3;
+    public static final int TYPE_CHANGE_EMAIL = 4;
+    public static final int TYPE_CHANGE_PASSWORD = 5;
 
     // status: 0-Chưa sử dụng, 1-Đã sử dụng, 2-Đã hủy
     // (Phương án B: verify/cancel thành công sẽ DELETE record, nhưng vẫn giữ status để tương thích schema)

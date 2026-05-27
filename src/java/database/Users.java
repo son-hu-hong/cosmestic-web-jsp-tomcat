@@ -256,6 +256,36 @@ public class Users implements Serializable {
         }
         return false;
     }
+    
+    public boolean checkUserNameExists(String userName, int exceptUserId) {
+        String sql = "SELECT userId FROM users WHERE userName=? AND userId<>?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userName);
+            ps.setInt(2, exceptUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+    
+    public boolean checkEmailExists(String userEmail, int exceptUserId) {
+        String sql = "SELECT userId FROM users WHERE userEmail=? AND userId<>?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userEmail);
+            ps.setInt(2, exceptUserId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     // 8. Cập nhật mật khẩu mới bằng Email
     public boolean updatePassword(String email, String hashedSubPassword) {
@@ -266,6 +296,27 @@ public class Users implements Serializable {
             ps.setString(1, hashedSubPassword);
             ps.setString(2, email);
 
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateProfileAccount(int userId, String userName, String fullName, String userSexual,
+            String userEmail, String userPhone, String userAddress, String hashedPassword) {
+        String sql = "UPDATE users SET userName=?, fullName=?, userSexual=?, userEmail=?, userPhone=?, userAddress=?, "
+                + "pass" + "word=? WHERE userId=?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, userName);
+            ps.setString(2, fullName);
+            ps.setString(3, userSexual != null ? userSexual : "default");
+            ps.setString(4, userEmail);
+            ps.setString(5, userPhone);
+            ps.setString(6, userAddress);
+            ps.setString(7, hashedPassword);
+            ps.setInt(8, userId);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

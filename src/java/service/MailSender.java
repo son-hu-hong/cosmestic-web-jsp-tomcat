@@ -90,6 +90,10 @@ public class MailSender {
                 return "DOSME - Mã OTP đăng nhập thiết bị lạ";
             case OTP.TYPE_FORGOT_PASSWORD:
                 return "DOSME - Mã OTP đặt lại mật khẩu";
+            case OTP.TYPE_CHANGE_EMAIL:
+                return "DOSME - Mã OTP đổi email";
+            case OTP.TYPE_CHANGE_PASSWORD:
+                return "DOSME - Mã OTP đổi mật khẩu";
             default:
                 return "DOSME - Mã OTP xác minh";
         }
@@ -106,6 +110,12 @@ public class MailSender {
                 break;
             case OTP.TYPE_FORGOT_PASSWORD:
                 purpose = "xác minh đặt lại mật khẩu";
+                break;
+            case OTP.TYPE_CHANGE_EMAIL:
+                purpose = "xác minh đổi email";
+                break;
+            case OTP.TYPE_CHANGE_PASSWORD:
+                purpose = "xác minh đổi mật khẩu";
                 break;
             default:
                 purpose = "xác minh";
