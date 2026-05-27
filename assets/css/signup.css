@@ -1,0 +1,135 @@
+/* RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* BODY */
+body {
+  background: linear-gradient(135deg, #f8e8ee, #fdf6f0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+/* CONTAINER */
+.container {
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  width: 420px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* TITLE */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #d63384;
+}
+
+/* FORM GROUP (label + input ngang) */
+.form-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+/* LABEL */
+.form-group label {
+  width: 140px;
+  font-size: 14px;
+  color: #333;
+  text-align: right;
+  padding-right: 10px;
+}
+
+/* INPUT */
+.form-group input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  transition: all 0.3s ease;
+  font-size: 14px;
+}
+
+/* INPUT FOCUS */
+.form-group input:focus {
+  border-color: #d63384;
+  box-shadow: 0 0 5px rgba(214, 51, 132, 0.3);
+  outline: none;
+}
+
+/* INPUT ERROR */
+input.error-input {
+  border-color: red;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #d63384;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+button:hover {
+  background: #b0256b;
+}
+
+/* ERROR TEXT */
+.error {
+  color: red;
+  font-size: 13px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+/* LINK TEXT */
+p {
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+}
+
+a {
+  color: #d63384;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* RESPONSIVE (mobile) */
+@media (max-width: 480px) {
+  .container {
+    width: 90%;
+    padding: 20px;
+  }
+
+  .form-group {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .form-group label {
+    width: 100%;
+    text-align: left;
+    margin-bottom: 5px;
+  }
+
+  .form-group input {
+    width: 100%;
+  }
+}
