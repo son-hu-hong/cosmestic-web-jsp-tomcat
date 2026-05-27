@@ -257,6 +257,20 @@ public class Users implements Serializable {
         return false;
     }
 
+    // 7.1 Cập nhật riêng tên đăng nhập
+    public boolean updateUserName(int userId, String newUserName) {
+        String sql = "UPDATE users SET userName=? WHERE userId=?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newUserName);
+            ps.setInt(2, userId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     // 8. Cập nhật mật khẩu mới bằng Email
     public boolean updatePassword(String email, String hashedSubPassword) {
         String sql = "UPDATE users SET password=? WHERE userEmail=?";
