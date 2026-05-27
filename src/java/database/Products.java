@@ -4,24 +4,30 @@ import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import service.GeminiAI;
 
 public class Products implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-    // --- THUỘC TÍNH (FIELDS) theo schema  ---
+    // --- CÁC THUỘC TÍNH (FIELDS) THEO ĐÚNG SCHEMA CỦA BẠN ---
     private int productId;
     private String productName;
-    private int productAmount;
-    private int productPrice;
-    private int productOldPrice;
+    private String sku;
+    private int stockQuantity;
+    private double productPrice;
+    private double productOldPrice;
     private int categoryId;
     private int brandId;
-    private int productStyle;
-    private int productColor;
-    private String productDesc;
-    private String productPro;
+    private String volume;
+    private String skinType;
+    private String description;
+    private String ingredients;
     private int productSold;
-    private int imageId;
+    private int isNew;
+    private int isBestSeller;
+    private int status;
+
+    // Thuộc tính bổ sung để hỗ trợ hiển thị ảnh đại diện chính kèm theo sản phẩm
+    private String mainImageUrl;
 
     // --- CONSTRUCTORS ---
     public Products() {}
@@ -31,204 +37,321 @@ public class Products implements Serializable {
     public void setProductId(int productId) { this.productId = productId; }
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
-    public int getProductPrice() { return productPrice; }
-    public void setProductPrice(int productPrice) { this.productPrice = productPrice; }
+    public String getSku() { return sku; }
+    public void setSku(String sku) { this.sku = sku; }
+    public int getStockQuantity() { return stockQuantity; }
+    public void setStockQuantity(int stockQuantity) { this.stockQuantity = stockQuantity; }
+    public double getProductPrice() { return productPrice; }
+    public void setProductPrice(double productPrice) { this.productPrice = productPrice; }
+    public double getProductOldPrice() { return productOldPrice; }
+    public void setProductOldPrice(double productOldPrice) { this.productOldPrice = productOldPrice; }
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
     public int getBrandId() { return brandId; }
     public void setBrandId(int brandId) { this.brandId = brandId; }
-    public String getProductDesc() { return productDesc; }
-    public void setProductDesc(String productDesc) { this.productDesc = productDesc; }
-    public int getImageId() { return imageId; }
-    public void setImageId(int imageId) { this.imageId = imageId; }
+    public String getVolume() { return volume; }
+    public void setVolume(String volume) { this.volume = volume; }
+    public String getSkinType() { return skinType; }
+    public void setSkinType(String skinType) { this.skinType = skinType; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public String getIngredients() { return ingredients; }
+    public void setIngredients(String ingredients) { this.ingredients = ingredients; }
+    public int getProductSold() { return productSold; }
+    public void setProductSold(int productSold) { this.productSold = productSold; }
+    public int getIsNew() { return isNew; }
+    public void setIsNew(int isNew) { this.isNew = isNew; }
+    public int getIsBestSeller() { return isBestSeller; }
+    public void setIsBestSeller(int isBestSeller) { this.isBestSeller = isBestSeller; }
+    public int getStatus() { return status; }
+    public void setStatus(int status) { this.status = status; }
+    public String getMainImageUrl() { return mainImageUrl; }
+    public void setMainImageUrl(String mainImageUrl) { this.mainImageUrl = mainImageUrl; }
 
-    public int getProductAmount() {
-        return productAmount;
-    }
+    // =========================================================================
+    // --- CHỨC NĂNG NGHIỆP VỤ BẢNG PRODUCTS (THÊM, SỬA, XÓA, HIỂN THỊ, TÌM KIẾM) ---
+    // =========================================================================
 
-    public void setProductAmount(int productAmount) {
-        this.productAmount = productAmount;
-    }
-
-    public int getProductOldPrice() {
-        return productOldPrice;
-    }
-
-    public void setProductOldPrice(int productOldPrice) {
-        this.productOldPrice = productOldPrice;
-    }
-
-    public int getProductStyle() {
-        return productStyle;
-    }
-
-    public void setProductStyle(int productStyle) {
-        this.productStyle = productStyle;
-    }
-
-    public int getProductColor() {
-        return productColor;
-    }
-
-    public void setProductColor(int productColor) {
-        this.productColor = productColor;
-    }
-
-    public String getProductPro() {
-        return productPro;
-    }
-
-    public void setProductPro(String productPro) {
-        this.productPro = productPro;
-    }
-
-    public int getProductSold() {
-        return productSold;
-    }
-
-    public void setProductSold(int productSold) {
-        this.productSold = productSold;
-    }
-    
-    // (Các getters/setters khác viết tương tự...)
-
-    // --- PHƯƠNG THỨC DAO ---
-
-    // 1. Thêm sản phẩm mới 
-// 1. Thêm sản phẩm mới đầy đủ các trường
+    // 1. CHỨC NĂNG: Thêm mới sản phẩm
     public boolean insertProduct(Products p) {
-        String sql = "INSERT INTO products (productName, productAmount, productPrice, productOldPrice, " +
-                     "categoryId, brandId, productStyle, productColor, productDesc, productPro, imageId) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO products (productName, sku, stockQuantity, productPrice, productOldPrice, " +
+                     "categoryId, brandId, volume, skinType, description, ingredients, productSold, isNew, isBestSeller, status) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = Connect.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, p.getProductName());
-            ps.setInt(2, p.getProductAmount());
-            ps.setInt(3, p.getProductPrice());
-            ps.setInt(4, p.getProductOldPrice());
-            ps.setInt(5, p.getCategoryId());
-            ps.setInt(6, p.getBrandId());
-            ps.setInt(7, p.getProductStyle());
-            ps.setInt(8, p.getProductColor());
-            ps.setString(9, p.getProductDesc());
-            ps.setString(10, p.getProductPro());
-            ps.setInt(11, p.getImageId());
+            ps.setString(2, p.getSku());
+            ps.setInt(3, p.getStockQuantity());
+            ps.setDouble(4, p.getProductPrice());
+            ps.setDouble(5, p.getProductOldPrice());
+            ps.setInt(6, p.getCategoryId());
+            ps.setInt(7, p.getBrandId());
+            ps.setString(8, p.getVolume());
+            ps.setString(9, p.getSkinType());
+            ps.setString(10, p.getDescription());
+            ps.setString(11, p.getIngredients());
+            ps.setInt(12, p.getProductSold());
+            ps.setInt(13, p.getIsNew());
+            ps.setInt(14, p.getIsBestSeller());
+            ps.setInt(15, p.getStatus());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-    // 2. Hàm ánh xạ kết quả (Cần thiết để hiển thị khi nhấn "Sửa")
+    // 2. CHỨC NĂNG: Chỉnh sửa thông tin sản phẩm
+    public boolean updateProduct(Products p) {
+        String sql = "UPDATE products SET productName=?, sku=?, stockQuantity=?, productPrice=?, productOldPrice=?, " +
+                     "categoryId=?, brandId=?, volume=?, skinType=?, description=?, ingredients=?, productSold=?, " +
+                     "isNew=?, isBestSeller=?, status=? WHERE productId=?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, p.getProductName());
+            ps.setString(2, p.getSku());
+            ps.setInt(3, p.getStockQuantity());
+            ps.setDouble(4, p.getProductPrice());
+            ps.setDouble(5, p.getProductOldPrice());
+            ps.setInt(6, p.getCategoryId());
+            ps.setInt(7, p.getBrandId());
+            ps.setString(8, p.getVolume());
+            ps.setString(9, p.getSkinType());
+            ps.setString(10, p.getDescription());
+            ps.setString(11, p.getIngredients());
+            ps.setInt(12, p.getProductSold());
+            ps.setInt(13, p.getIsNew());
+            ps.setInt(14, p.getIsBestSeller());
+            ps.setInt(15, p.getStatus());
+            ps.setInt(16, p.getProductId());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 3. CHỨC NĂNG: Xóa sản phẩm (Ràng buộc CASCADE tự động dọn sạch bảng productImages liên quan)
+    public boolean deleteProduct(int productId) {
+        String sql = "DELETE FROM products WHERE productId = ?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 4. CHỨC NĂNG: Lấy danh sách toàn bộ sản phẩm (Kèm ảnh chính đại diện)
+    public List<Products> getAllProducts() {
+        List<Products> list = new ArrayList<>();
+        String sql = "SELECT p.*, (SELECT imageUrl FROM productImages WHERE productId = p.productId AND isMain = 1 LIMIT 1) AS mainImage " +
+                     "FROM products p ORDER BY p.productId DESC";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(mapResultSetToProduct(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // 5. CHỨC NĂNG: Tìm kiếm linh hoạt nâng cao (Theo tên, khoảng giá, danh mục, hãng, thẻ lọc)
+    public List<Products> searchProducts(String txtSearch, Integer catId, Integer bId, Double minPrice, Double maxPrice, Integer isNewFlag, Integer isBestFlag) {
+        List<Products> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT p.*, (SELECT imageUrl FROM productImages WHERE productId = p.productId AND isMain = 1 LIMIT 1) AS mainImage " +
+            "FROM products p WHERE 1=1"
+        );
+
+        if (txtSearch != null && !txtSearch.trim().isEmpty()) sql.append(" AND p.productName LIKE ?");
+        if (catId != null && catId > 0) sql.append(" AND p.categoryId = ?");
+        if (bId != null && bId > 0) sql.append(" AND p.brandId = ?");
+        if (minPrice != null) sql.append(" AND p.productPrice >= ?");
+        if (maxPrice != null) sql.append(" AND p.productPrice <= ?");
+        if (isNewFlag != null) sql.append(" AND p.isNew = ?");
+        if (isBestFlag != null) sql.append(" AND p.isBestSeller = ?");
+        
+        sql.append(" AND p.status = 1 ORDER BY p.productId DESC");
+
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int index = 1;
+            if (txtSearch != null && !txtSearch.trim().isEmpty()) ps.setString(index++, "%" + txtSearch + "%");
+            if (catId != null && catId > 0) ps.setInt(index++, catId);
+            if (bId != null && bId > 0) ps.setInt(index++, bId);
+            if (minPrice != null) ps.setDouble(index++, minPrice);
+            if (maxPrice != null) ps.setDouble(index++, maxPrice);
+            if (isNewFlag != null) ps.setInt(index++, isNewFlag);
+            if (isBestFlag != null) ps.setInt(index++, isBestFlag);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToProduct(rs));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    // =========================================================================
+    // --- CHỨC NĂNG NGHIỆP VỤ BẢNG PRODUCTIMAGES (QUẢN LÝ ALBUM ẢNH) ---
+    // =========================================================================
+
+    // 6. CHỨC NĂNG: Thêm ảnh vào album (Hỗ trợ xử lý cờ Checkbox ảnh chính)
+    public boolean addProductImage(int productId, String imageUrl, int isMain) {
+        Connection conn = null;
+        try {
+            conn = Connect.getConnection();
+            conn.setAutoCommit(false); // Bật Transaction xử lý đồng bộ an toàn
+
+            if (isMain == 1) {
+                // Nếu ảnh này được chọn làm ảnh chính, hạ cấp toàn bộ ảnh cũ của sản phẩm này về ảnh phụ (isMain = 0)
+                String resetSql = "UPDATE productImages SET isMain = 0 WHERE productId = ?";
+                try (PreparedStatement psReset = conn.prepareStatement(resetSql)) {
+                    psReset.setInt(1, productId);
+                    psReset.executeUpdate();
+                }
+            }
+
+            // Chèn ảnh mới vào album
+            String insertSql = "INSERT INTO productImages (productId, imageUrl, isMain) VALUES (?, ?, ?)";
+            try (PreparedStatement psInsert = conn.prepareStatement(insertSql)) {
+                psInsert.setInt(1, productId);
+                psInsert.setString(2, imageUrl);
+                psInsert.setInt(3, isMain);
+                psInsert.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+        return false;
+    }
+
+    // 7. CHỨC NĂNG: Xóa một ảnh cụ thể ra khỏi album
+    public boolean deleteProductImage(int imageId) {
+        String sql = "DELETE FROM productImages WHERE imageId = ?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, imageId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 8. CHỨC NĂNG: Cập nhật sửa đổi đường dẫn ảnh (Chỉnh sửa hình ảnh)
+    public boolean updateProductImageUrl(int imageId, String newImageUrl) {
+        String sql = "UPDATE productImages SET imageUrl = ? WHERE imageId = ?";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newImageUrl);
+            ps.setInt(2, imageId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    // 9. CHỨC NĂNG: Đặt hình ảnh chính (Tác vụ khi bấm Checkbox trên Giao diện Admin)
+    public boolean setMainImage(int productId, int imageId) {
+        Connection conn = null;
+        try {
+            conn = Connect.getConnection();
+            conn.setAutoCommit(false); // Bật tính năng giao dịch an toàn (Transaction)
+
+            // Bước A: Hạ cấp mọi ảnh thuộc sản phẩm này về ảnh phụ (isMain = 0)
+            String demoteSql = "UPDATE productImages SET isMain = 0 WHERE productId = ?";
+            try (PreparedStatement ps1 = conn.prepareStatement(demoteSql)) {
+                ps1.setInt(1, productId);
+                ps1.executeUpdate();
+            }
+
+            // Bước B: Kích hoạt ảnh được chỉ định lên làm ảnh chính (isMain = 1)
+            String promoteSql = "UPDATE productImages SET isMain = 1 WHERE imageId = ?";
+            try (PreparedStatement ps2 = conn.prepareStatement(promoteSql)) {
+                ps2.setInt(1, imageId);
+                ps2.executeUpdate();
+            }
+
+            conn.commit(); // Hoàn tất thực thi lưu thông tin xuống database
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+        } finally {
+            if (conn != null) {
+                try { conn.setAutoCommit(true); conn.close(); } catch (SQLException e) { e.printStackTrace(); }
+            }
+        }
+        return false;
+    }
+
+    // 10. CHỨC NĂNG: Lấy album ảnh phụ của một sản phẩm (Thường dùng cho trang chi tiết)
+    public List<String> getProductImagesAlbum(int productId) {
+        List<String> images = new ArrayList<>();
+        String sql = "SELECT imageUrl FROM productImages WHERE productId = ? ORDER BY isMain DESC, imageId ASC";
+        try (Connection conn = Connect.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    images.add(rs.getString("imageUrl"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return images;
+    }
+
+    // --- HÀM PHỤ TRỢ (HELPER METHOD) MAPPING DỮ LIỆU ---
     private Products mapResultSetToProduct(ResultSet rs) throws SQLException {
         Products p = new Products();
         p.setProductId(rs.getInt("productId"));
         p.setProductName(rs.getString("productName"));
-        p.setProductAmount(rs.getInt("productAmount")); // Bổ sung số lượng 
-        p.setProductPrice(rs.getInt("productPrice"));
-        p.setProductOldPrice(rs.getInt("productOldPrice"));
+        p.setSku(rs.getString("sku"));
+        p.setStockQuantity(rs.getInt("stockQuantity"));
+        p.setProductPrice(rs.getDouble("productPrice"));
+        p.setProductOldPrice(rs.getDouble("productOldPrice"));
         p.setCategoryId(rs.getInt("categoryId"));
         p.setBrandId(rs.getInt("brandId"));
-        p.setProductStyle(rs.getInt("productStyle")); // Bổ sung kích thước 
-        p.setProductColor(rs.getInt("productColor")); // Bổ sung màu sắc 
-        p.setProductDesc(rs.getString("productDesc"));
-        p.setProductPro(rs.getString("productPro")); // Bổ sung thuộc tính 
-        p.setImageId(rs.getInt("imageId"));
+        p.setVolume(rs.getString("volume"));
+        p.setSkinType(rs.getString("skinType"));
+        p.setDescription(rs.getString("description"));
+        p.setIngredients(rs.getString("ingredients"));
+        p.setProductSold(rs.getInt("productSold"));
+        p.setIsNew(rs.getInt("isNew"));
+        p.setIsBestSeller(rs.getInt("isBestSeller"));
+        p.setStatus(rs.getInt("status"));
+        
+        // Nhận dữ liệu ảnh chính (nếu câu lệnh SELECT có chứa cột alias này)
+        try {
+            p.setMainImageUrl(rs.getString("mainImage"));
+        } catch (SQLException ignored) {
+            // Trường hợp câu lệnh truy vấn không join lấy ảnh thì bỏ qua
+        }
         return p;
-    }
-
-    // 2. Xóa sản phẩm
-    public boolean deleteProduct(int id) {
-        String sql = "DELETE FROM products WHERE productId = ?";
-        try (Connection conn = Connect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
-        return false;
-    }
-
-    // 3. Tìm kiếm và Lọc nâng cao (Giá, Hãng, Sắp xếp)
-    public List<Products> getFilteredProducts(String keyword, Integer catId, Integer bId, Integer minPrice, Integer maxPrice, String sortBy, boolean isAsc) {
-        List<Products> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM products WHERE 1=1 ");
-        
-        if (keyword != null && !keyword.isEmpty()) sql.append(" AND productName LIKE ? ");
-        if (catId != null) sql.append(" AND categoryId = ? ");
-        if (bId != null) sql.append(" AND brandId = ? ");
-        if (minPrice != null) sql.append(" AND productPrice >= ? ");
-        if (maxPrice != null) sql.append(" AND productPrice <= ? ");
-        
-        String order = isAsc ? "ASC" : "DESC";
-        if (sortBy != null && sortBy.matches("^(productPrice|productName|productSold)$")) {
-            sql.append(" ORDER BY ").append(sortBy).append(" ").append(order);
-        }
-
-        try (Connection conn = Connect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int idx = 1;
-            if (keyword != null && !keyword.isEmpty()) ps.setString(idx++, "%" + keyword + "%");
-            if (catId != null) ps.setInt(idx++, catId);
-            if (bId != null) ps.setInt(idx++, bId);
-            if (minPrice != null) ps.setInt(idx++, minPrice);
-            if (maxPrice != null) ps.setInt(idx++, maxPrice);
-
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                list.add(mapResultSetToProduct(rs));
-            }
-        } catch (SQLException e) { e.printStackTrace(); }
-        return list;
-    }
-
-    // 4. Tìm sản phẩm tương đương bằng Hình ảnh (A.I)
-    public List<Products> searchByImageAI(String imageAnalysisResult) throws Exception {
-        // Gửi mô tả hình ảnh từ AI tới database để tìm sản phẩm có mô tả tương đồng
-        String prompt = "Dựa trên kết quả phân tích hình ảnh: '" + imageAnalysisResult + "', hãy liệt kê các từ khóa chính về loại mỹ phẩm, màu sắc và công dụng.";
-        String keywords = GeminiAI.generateText(prompt); 
-        
-        // Tìm kiếm các sản phẩm có mô tả chứa từ khóa AI gợi ý
-        return getFilteredProducts(keywords, null, null, null, null, "productSold", false);
-    }
-
-    // 5. Thêm nhanh từ dữ liệu Excel (Dùng giả lập danh sách từ file Excel)
-    public int importFromExcel(List<String[]> excelData) {
-        int count = 0;
-        for (String[] row : excelData) {
-            // Cột: Tên SP, Loại (tên), Thương hiệu (tên), Giá, Mô tả, Đường dẫn ảnh
-            Products p = new Products();
-            p.setProductName(row[0]);
-            p.setProductPrice(Integer.parseInt(row[3]));
-            p.setProductDesc(row[4]);
-            
-            // Logic tìm ID từ tên (Cần viết thêm hàm findIdByName cho Category/Brand)
-            p.setCategoryId(findCategoryIdByName(row[1])); 
-            p.setBrandId(findBrandIdByName(row[2]));
-            
-            if (insertProduct(p)) count++;
-        }
-        return count;
-    }
-
-    // Hàm phụ trợ tìm ID danh mục theo tên [cite: 5]
-    private int findCategoryIdByName(String name) {
-        String sql = "SELECT categoryId FROM categorys WHERE categoryName = ?";
-        try (Connection conn = Connect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) { e.printStackTrace(); }
-        return 1; // Mặc định nếu không tìm thấy
-    }
-
-    private int findBrandIdByName(String name) {
-        String sql = "SELECT brandId FROM brands WHERE brandName = ?";
-        try (Connection conn = Connect.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) return rs.getInt(1);
-        } catch (SQLException e) { e.printStackTrace(); }
-        return 1;
     }
 }
